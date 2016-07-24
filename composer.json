@@ -1,0 +1,18 @@
+{
+    "name": "calculatietool/authorizer",
+    "description": "CalculatietTool.com oauth2 authorizer",
+    "license": "MIT",
+    "authors": [{
+        "name": "Yorick de Wid",
+        "email": "info@calculatietool.com"
+    }],
+    "require": {
+        "php": "^5.6 || ^7.0",
+        "socialiteproviders/manager": "~2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "CalculatieTool\\Authorizer\\": "src/"
+        }
+    }
+}
