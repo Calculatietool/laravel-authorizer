@@ -13,6 +13,7 @@ class Provider extends AbstractProvider implements ProviderInterface
      * Unique Provider Identifier.
      */
     const IDENTIFIER = 'CALCULATIETOOL';
+    const HOST = 'http://localhost';
 
     /**
      * {@inheritdoc}
@@ -25,7 +26,7 @@ class Provider extends AbstractProvider implements ProviderInterface
     protected function getAuthUrl($state)
     {
         return $this->buildAuthUrlFromBase(
-            'http://localhost/oauth2/authorize', $state
+            self::HOST . '/oauth2/authorize', $state
         );
     }
 
@@ -34,7 +35,7 @@ class Provider extends AbstractProvider implements ProviderInterface
      */
     protected function getTokenUrl()
     {
-        return 'http://localhost/oauth2/token';
+        return self::HOST . '/oauth2/access_token';
     }
 
     /**
@@ -43,14 +44,10 @@ class Provider extends AbstractProvider implements ProviderInterface
     protected function getUserByToken($token)
     {
         $response = $this->getHttpClient()->get(
-            'https://api.vk.com/method/users.get?user_ids='.$token['user_id'].'&fields=uid,first_name,last_name,screen_name,photo'
+            self::HOST . '/oauth2/rest/user?access_token=' . $token['access_token']
         );
 
-        $response = json_decode($response->getBody()->getContents(), true)['response'][0];
-
-        return array_merge($response, [
-            'email' => array_get($token, 'email'),
-        ]);
+        return json_decode($response->getBody()->getContents(), true);
     }
 
     /**
@@ -59,9 +56,12 @@ class Provider extends AbstractProvider implements ProviderInterface
     protected function mapUserToObject(array $user)
     {
         return (new User())->setRaw($user)->map([
-            'id' => $user['uid'], 'nickname' => $user['screen_name'],
-            'name' => $user['first_name'].' '.$user['last_name'],
-            'email' => array_get($user, 'email'), 'avatar' => $user['photo'],
+            'id' => $user['id'],
+            'username' => $user['username'],
+            'firstname' => $user['firstname'],
+            'lastname' => $user['lastname'],
+            'email' => $user['email'],
+            'isadmin' => $user['isadmin'],
         ]);
     }
 
