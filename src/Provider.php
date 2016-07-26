@@ -13,7 +13,7 @@ class Provider extends AbstractProvider implements ProviderInterface
      * Unique Provider Identifier.
      */
     const IDENTIFIER = 'CALCULATIETOOL';
-    const HOST = 'http://localhost';
+    const HOST = 'https://stage.calculatietool.com';
 
     /**
      * {@inheritdoc}
@@ -57,6 +57,7 @@ class Provider extends AbstractProvider implements ProviderInterface
     {
         return (new User())->setRaw($user)->map([
             'id' => $user['id'],
+            'name' => $user['firstname'] . ' ' . $user['lastname'],
             'username' => $user['username'],
             'firstname' => $user['firstname'],
             'lastname' => $user['lastname'],
@@ -96,6 +97,14 @@ class Provider extends AbstractProvider implements ProviderInterface
             $token = $this->getAccessTokenResponse($this->getCode())
         ));
 
-        return $user->setToken(array_get($token, 'access_token'));
+        unset($user->accessTokenResponseBody);
+        unset($user->nickname);
+        unset($user->avatar);
+
+        $user->setToken(array_get($token, 'access_token'));
+        $user->setRefreshToken(array_get($token, 'refresh_token'));
+        $user->setExpiresIn(array_get($token, 'expires_in'));
+
+        return $user;
     }
 }
