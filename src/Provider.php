@@ -63,6 +63,7 @@ class Provider extends AbstractProvider implements ProviderInterface
             'lastname' => $user['lastname'],
             'email' => $user['email'],
             'isadmin' => $user['isadmin'],
+            'issuperuser' => $user['issuperuser'],
         ]);
     }
 
