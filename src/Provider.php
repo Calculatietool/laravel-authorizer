@@ -13,7 +13,7 @@ class Provider extends AbstractProvider implements ProviderInterface
      * Unique Provider Identifier.
      */
     const IDENTIFIER = 'CALCULATIETOOL';
-    const HOST = 'https://stage.calculatietool.com';
+    const HOST = 'https://app.calculatietool.com';
 
     /**
      * {@inheritdoc}
@@ -21,12 +21,27 @@ class Provider extends AbstractProvider implements ProviderInterface
     protected $scopes = [''];
 
     /**
+     * Get endpoint from config if set.
+     *
+     * @return string
+     */
+    protected function getEndpoint()
+    {
+        $config_endpoint = config('services.calculatietool.endpoint');
+        if (!is_null($config_endpoint)) {
+            return $config_endpoint;
+        }
+
+        return self::HOST;
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function getAuthUrl($state)
     {
         return $this->buildAuthUrlFromBase(
-            self::HOST . '/oauth2/authorize', $state
+            $this->getEndpoint() . '/oauth2/authorize', $state
         );
     }
 
@@ -35,7 +50,7 @@ class Provider extends AbstractProvider implements ProviderInterface
      */
     protected function getTokenUrl()
     {
-        return self::HOST . '/oauth2/access_token';
+        return $this->getEndpoint() . '/oauth2/access_token';
     }
 
     /**
@@ -44,7 +59,7 @@ class Provider extends AbstractProvider implements ProviderInterface
     protected function getUserByToken($token)
     {
         $response = $this->getHttpClient()->get(
-            self::HOST . '/oauth2/rest/user?access_token=' . $token['access_token']
+            $this->getEndpoint() . '/oauth2/rest/user?access_token=' . $token['access_token']
         );
 
         return json_decode($response->getBody()->getContents(), true);
